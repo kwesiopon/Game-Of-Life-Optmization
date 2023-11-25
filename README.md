@@ -1,29 +1,17 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
-
+Game of Life Optimization Using GPU Parallelism (and potentially SIMD)
 ### What is this repository for? ###
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+* An investigation into how certain optimization techniques (GPU Parallelism/SIMD Vectorization) affect the speed-up of Conway's Game of Life.
+
 
 ### How do I get set up? ###
 
-* Summary of set up
+* Clone repo and quickly 
 * Configuration
 * Dependencies
 * Database configuration
 * How to run tests
 * Deployment instructions
 
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
