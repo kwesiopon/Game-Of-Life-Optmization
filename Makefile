@@ -14,7 +14,7 @@ ifeq ($(CXX),g++)
   CXXFLAGS += -mtune=native -march=native
 endif
 
-EXEC = nbody3
+EXEC = main_gol
 
 all: $(EXEC)
 
@@ -22,11 +22,11 @@ all: $(EXEC)
 include $(COMMON)/Makefile.common
 LDFLAGS	  = $(COMMON_LIBS)
 
-nbody3.o: nbody3.cpp
+main_gol.o: main_gol.cpp
 	$(CXX) $(CXXFLAGS) -c main_gol.cpp
 
-nbody3: nbody3.o $(COMMON_OBJS)
-	$(CXX) $(CXXFLAGS) -o nbody3 nbody3.o $(COMMON_OBJS) $(LDFLAGS)
+main_gol: main_gol.o $(COMMON_OBJS)
+	$(CXX) $(CXXFLAGS) -o main.gol main_gol.o $(COMMON_OBJS) $(LDFLAGS)
 
 clean: clean_common
 	/bin/rm -fv $(EXEC) *.o *.optrpt *.d
