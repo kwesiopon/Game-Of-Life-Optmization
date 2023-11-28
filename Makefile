@@ -1,4 +1,3 @@
-COMMON	= ../common
 
 DBG      ?=
 CXX      ?= g++
