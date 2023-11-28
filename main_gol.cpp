@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <cstring>
 
 typedef unsigned char byte;
 
@@ -10,7 +11,7 @@ public:
     world( int x, int y ) : _wid( x ), _hei( y ) {
         int s = _wid * _hei * sizeof( byte );
         _cells = new byte[s];
-        memset( _cells, 0, s );
+       memset( _cells, 0, s );
     }
     ~world() {
         delete [] _cells;
