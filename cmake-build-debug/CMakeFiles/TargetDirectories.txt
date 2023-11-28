@@ -1,0 +1,3 @@
+/Users/kwesiopon/CLionProjects/Game-Of-Life-Optimization/cmake-build-debug/CMakeFiles/Game_Of_Life_Optimization.dir
+/Users/kwesiopon/CLionProjects/Game-Of-Life-Optimization/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/kwesiopon/CLionProjects/Game-Of-Life-Optimization/cmake-build-debug/CMakeFiles/rebuild_cache.dir
