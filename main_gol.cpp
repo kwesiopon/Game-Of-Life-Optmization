@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <cstring>
+#include "timer.h"
 
 
 typedef unsigned char byte;
@@ -146,7 +147,7 @@ public:
         generation(g);
     }
 private:
-    //potential candidate for optimization
+    //potential candidate (poor) for optimization
     //should investigate a way to record runtime for each iteration.
     void display() {
         system( "cls" );
@@ -163,12 +164,13 @@ private:
         }
         std::cout << "+" << std::string( wid, '-' ) << "+\n";
         std::cout << "Generation: " << gen << "\n\n";//Press [RETURN] for the next generation...";
-        //std::cin.get();
+
     }
 
-    //need to edit generation such that it just prints the number of set gens
+    //Included parameter to enable generation control
     void generation(int g) {
-
+        double t_begin=0;
+        TimerType t0 = getTimeStamp();
         do {
             display();
             rl->applyRules();
@@ -176,6 +178,9 @@ private:
             gen++;
         }
         while ( gen < g );
+        TimerType t1 = getTimeStamp();
+        t_begin = getElapsedTime(t0,t1)*1000;
+        std::cout << "Runtime for " << g << " generations: " << t_begin << "\n\n";
     }
     rule* rl;
     world* wrd;
