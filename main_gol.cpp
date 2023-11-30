@@ -4,6 +4,7 @@
 #include <string>
 #include <cstring>
 
+
 typedef unsigned char byte;
 
 class world {
@@ -109,7 +110,8 @@ public:
         if( rl ) delete rl;
         delete wrd;
     }
-    void start( int r ) {
+    //customized to allow predetermined generations
+    void start( int r, int g ) {
         rl = new rule( wrd );
         gen = 1;
         std::vector<int> t;
@@ -141,7 +143,7 @@ public:
         wrd->set( 1, 3, 1 ); wrd->set( 2, 3, 1 );
         wrd->set( 3, 3, 1 );
         /******************************************/
-        generation();
+        generation(g);
     }
 private:
     //potential candidate for optimization
@@ -160,17 +162,20 @@ private:
             std::cout << "|\n";
         }
         std::cout << "+" << std::string( wid, '-' ) << "+\n";
-        std::cout << "Generation: " << gen << "\n\nPress [RETURN] for the next generation...";
-        std::cin.get();
+        std::cout << "Generation: " << gen << "\n\n";//Press [RETURN] for the next generation...";
+        //std::cin.get();
     }
-    void generation() {
+
+    //need to edit generation such that it just prints the number of set gens
+    void generation(int g) {
+
         do {
             display();
             rl->applyRules();
             rl->swapWrds();
             gen++;
         }
-        while ( rl->hasLivingCells() );
+        while ( gen < g );
     }
     rule* rl;
     world* wrd;
@@ -186,7 +191,14 @@ int main( int argc, char* argv[] ) {
         std::cin >> o;
     }
     while( o < 1 || o > 4 );
+
+    std::cout << " How many generations do you want to run?";
+    int in;
+    do {
+        std::cin >> in;
+    }
+    while( in < 1 || in > 20 );
     std::cin.ignore();
-    c.start( o );
+    c.start( o,in );
     return system( "pause" );
 }
