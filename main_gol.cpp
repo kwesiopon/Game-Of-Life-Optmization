@@ -187,23 +187,68 @@ private:
     int gen;
 };
 
-int main( int argc, char* argv[] ) {
-    cellular c( 20, 12 );
-    std::cout << "\n\t*** CELLULAR AUTOMATA ***" << "\n\n Which one you want to run?\n\n\n";
-    std::cout << " [1]\tConway's Life\n [2]\tAmoeba\n [3]\tLife 34\n [4]\tMaze\n\n > ";
-    int o;
-    do {
-        std::cin >> o;
-    }
-    while( o < 1 || o > 4 );
+void help(const char* prg)
+{
+    if (prg) fprintf(stderr,"%s:\n", prg);
+    fprintf(stderr,"\t--help | -h       : Print help message.\n");
+    fprintf(stderr,"\t--nparticles | -n : # of particles (100).\n");
+    fprintf(stderr,"\t--nsteps | -s     : # of steps to take (100).\n");
+    fprintf(stderr,"\t--stepsize | -dt  : Delta-t step-size in seconds (0.01).\n");
+    fprintf(stderr,"\t--float | -f      : Use 32-bit floats.\n");
+    fprintf(stderr,"\t--double | -d     : Use 64-bit doubles. (default)\n");
+}
 
-    std::cout << " How many generations do you want to run?";
-    int in;
-    do {
-        std::cin >> in;
-    }
-    while( in < 1 || in > 20 );
-    std::cin.ignore();
-    c.start( o,in );
-    return system( "pause" );
+int main( int argc, char* argv[] ) {
+    //default cellular automata: in this case, Game of Life
+    int automata = 1;
+
+    //the default number of generations
+    int g = 10;
+
+    //default world size
+    int height = 12;
+    int width = 20;
+
+    for (int i = 1; i < argc; ++i) {
+#define check_index(i, str) \
+    if ((i) >= argc) \
+    {fprintf(stderr, "Missing 2nd argument for %s\n", str);help(argv[0]);return 1; }
+
+        if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0)
+        {
+            help(argv[0]);
+            return 0;
+        }
+        else if (strcmp(argv[i], "--nheight") == 0 || strcmp(argv[i], "-nh") == 0)
+        {
+            check_index(i + 1, "--nheight|-nh") ;
+                i++;
+                if (not(isdigit(*argv[i]))) {
+                    fprintf(stderr, "Invalid value for option \"--ncells\" %s\n", argv[i]);help(argv[0]);return 1;
+                }
+                height = atoi(argv[i]);
+            }
+        else if (strcmp(argv[i], "--nwidth") == 0 || strcmp(argv[i], "-w") == 0) {
+                check_index(i + 1, "--nwidth|-w") ;
+                    i++;
+                    if (not(isdigit(*argv[i])))
+                        {fprintf(stderr, "Invalid value for option \"--ncells\" %s\n", argv[i]);help(argv[0]);return 1;}
+                    width = atoi(argv[i]);
+                } else if (strcmp(argv[i], "--ngenerations") == 0 || strcmp(argv[i], "-g") == 0) {
+                    check_index(i + 1, "--ngenerations|-g") ;
+                        i++;
+                        if (not(isdigit(*argv[i])))
+                            {fprintf(stderr, "Invalid value for option \"--ngenerations\" %s\n", argv[i]);help(argv[0]);return 1;}
+                        g = atoi(argv[i]);
+                    } else
+                    {
+                        fprintf(stderr, "Unknown option %s\n", argv[i]);
+                        help(argv[0]);
+                        return 1;
+                    }
+                }
+
+    cellular c( width, height );
+    c.start( automata,g );
+    return 0;
 }
