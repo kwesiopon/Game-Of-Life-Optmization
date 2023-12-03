@@ -1,4 +1,4 @@
-
+COMMON_OBJS = timer.o dummy.o
 DBG      ?=
 CXX      ?= g++
 CXXFLAGS  = -O3 -I. -std=c++11 -I$(COMMON) $(DBG)
