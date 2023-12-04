@@ -31,8 +31,8 @@ EXEC = main_gol
 all: $(EXEC)
 
 # Load common make options
-#include $(COMMON)/Makefile.common
-#LDFLAGS	  = $(COMMON_LIBS)
+include $(COMMON)/Makefile.common
+LDFLAGS	  = $(COMMON_LIBS)
 
 main_gol.o: main_gol.cpp
 	$(CXX) $(CXXFLAGS) -c main_gol.cpp
