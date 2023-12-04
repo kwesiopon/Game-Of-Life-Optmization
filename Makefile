@@ -26,7 +26,7 @@ ifeq ($(CXX),g++)
   CXXFLAGS += -mtune=native -march=native
 endif
 
-EXEC = main_gol
+EXEC = main_gol gol_acc
 
 all: $(EXEC)
 
