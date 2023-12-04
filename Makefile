@@ -34,11 +34,17 @@ all: $(EXEC)
 include Makefile.common
 LDFLAGS	  = $(COMMON_LIBS)
 
+-include *.d
+
 main_gol.o: main_gol.cpp
 	$(CXX) $(CXXFLAGS) -c main_gol.cpp
 
 main_gol: main_gol.o $(COMMON_OBJS)
 	$(CXX) $(CXXFLAGS) -o main.gol main_gol.o $(COMMON_OBJS) $(LDFLAGS)
+
+%_acc.o: %_acc.cpp
+	$(ACC) $(ACCFLAGS) -c $< -o $@
+	$(ACC) -MM $(ACCFLAGS) $< > $*.d
 
 clean: clean_common
 	/bin/rm -fv $(EXEC) *.o *.optrpt *.d
