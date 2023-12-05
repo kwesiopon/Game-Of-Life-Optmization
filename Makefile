@@ -3,8 +3,6 @@ DBG      ?= -g
 CXX      ?= g++
 CXXFLAGS  = -O3 -I. -std=c++11 -I$(COMMON) $(DBG)
 
-NVCC	= nvcc
-NVFLAGS	= -O3 -g -I. -std=c++11 -I$(COMMON) -arch sm_70 -g --resource-usage -O3
 
 ACC	    = nvc++
 ACCFLAGS= -O3 -g -I. -std=c++11 -I$(COMMON) -acc -gpu=cc70 -g --restrict
