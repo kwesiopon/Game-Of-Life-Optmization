@@ -180,7 +180,7 @@ private:
         while ( gen < g );
         TimerType t1 = getTimeStamp();
         t_begin = getElapsedTime(t0,t1)*1000;
-        std::cout << "Runtime for " << g << " generations: " << t_begin << "\n\n";
+        std::cout << "Runtime for " << g << " generations: " << t_begin << "ms" << "\n\n";
     }
     rule* rl;
     world* wrd;
@@ -190,12 +190,12 @@ private:
 void help(const char* prg)
 {
     if (prg) fprintf(stderr,"%s:\n", prg);
-    fprintf(stderr,"\t--help | -h       : Print help message.\n");
-    fprintf(stderr,"\t--nparticles | -n : # of particles (100).\n");
-    fprintf(stderr,"\t--nsteps | -s     : # of steps to take (100).\n");
-    fprintf(stderr,"\t--stepsize | -dt  : Delta-t step-size in seconds (0.01).\n");
-    fprintf(stderr,"\t--float | -f      : Use 32-bit floats.\n");
-    fprintf(stderr,"\t--double | -d     : Use 64-bit doubles. (default)\n");
+    fprintf(stderr,"\t--help    | -h       : Print help message.\n");
+    fprintf(stderr,"\t--nheight | -nh      : height of world.\n");
+    fprintf(stderr,"\t--ngen    | -g       : # of generations to print (10).\n");
+    fprintf(stderr,"\t--nwidth  | -w       : with of world\n");
+    fprintf(stderr,"\t--float   | -f       : Use 32-bit floats.\n");
+    fprintf(stderr,"\t--double  | -d       : Use 64-bit doubles. (default)\n");
 }
 
 int main( int argc, char* argv[] ) {

@@ -30,6 +30,11 @@ EXEC = main_gol gol_acc
 
 all: $(EXEC)
 
+OBJS = $(EXEC:=.o)
+DEPS = $(OBJS:.o=.d)
+
+-include $(DEPS)
+
 # Load common make options
 include Makefile.common
 LDFLAGS	  = $(COMMON_LIBS)
@@ -40,7 +45,10 @@ main_gol.o: main_gol.cpp
 	$(CXX) $(CXXFLAGS) -c main_gol.cpp
 
 main_gol: main_gol.o $(COMMON_OBJS)
-	$(CXX) $(CXXFLAGS) -o main.gol main_gol.o $(COMMON_OBJS) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) -o main_gol $^ $(CXXFLAGS)
+
+gol_acc: gol_acc.cpp $(COMMON_OBJS)
+    $(ACC) $(ACCFLAGS) -o gol_acc $^ $(LDSFlAGS)
 
 %_acc.o: %_acc.cpp
 	$(ACC) $(ACCFLAGS) -c $< -o $@
