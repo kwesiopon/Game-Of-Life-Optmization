@@ -52,9 +52,5 @@ main_gol: main_gol.o $(COMMON_OBJS)
 gol_acc: gol_acc.cpp $(COMMON_OBJS)
 	$(ACC) $(ACCFLAGS) -o gol_acc $^ $(LDSFlAGS)
 
-%_acc.o: %_acc.cpp
-	$(ACC) $(ACCFLAGS) -c $< -o $@
-	$(ACC) -MM $(ACCFLAGS) $< > $*.d
-
 clean: clean_common
 	/bin/rm -fv $(EXEC) *.o *.optrpt *.d
