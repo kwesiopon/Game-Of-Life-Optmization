@@ -11,9 +11,6 @@ ACC	    = nvc++
 ACCFLAGS= -O3 -g -I. -std=c++11 -I$(COMMON) -acc -gpu=cc70 -g --restrict
 ACCFLAGS+= -Minfo=acc
 
-CXX		= $(NVCC)
-CXXFLAGS= $(NVFLAGS)
-CXXFLAGS+= -D_GLIBCXX_USE_CXX11_ABI=0
 
 LD		= $(ACC)
 #LDFLAGS = -lcudart $(ACCFLAGS)
