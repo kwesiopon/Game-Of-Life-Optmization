@@ -1,3 +1,4 @@
+COMMON = Makefile.common
 COMMON_OBJS = timer.o dummy.o
 DBG      ?= -g
 CXX      ?= g++
