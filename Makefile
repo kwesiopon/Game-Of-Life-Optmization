@@ -1,5 +1,5 @@
 COMMON_OBJS = timer.o dummy.o
-DBG      ?=
+DBG      ?= -g
 CXX      ?= g++
 CXXFLAGS  = -O3 -I. -std=c++11 -I$(COMMON) $(DBG)
 
@@ -48,7 +48,7 @@ main_gol: main_gol.o $(COMMON_OBJS)
 	$(CXX) $(CXXFLAGS) -o main_gol $^ $(CXXFLAGS)
 
 gol_acc: gol_acc.cpp $(COMMON_OBJS)
-    $(ACC) $(ACCFLAGS) -o gol_acc $^ $(LDSFlAGS)
+	$(ACC) $(ACCFLAGS) -o gol_acc $^ $(LDSFlAGS)
 
 %_acc.o: %_acc.cpp
 	$(ACC) $(ACCFLAGS) -c $< -o $@
