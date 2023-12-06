@@ -7,6 +7,13 @@
 
 #define RESTRICT restrict
 
+#ifdef __NVCOMPILER
+#  define FMT_NVCOMPILER_VERSION \
+    (__NVCOMPILER_MAJOR__ * 100 + __NVCOMPILER_MINOR__)
+#else
+#  define FMT_NVCOMPILER_VERSION 0
+#endif
+
 typedef unsigned char byte;
 
 class world {
