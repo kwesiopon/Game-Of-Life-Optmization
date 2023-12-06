@@ -31,7 +31,7 @@ EXEC = main_gol gol_acc
 
 all: $(EXEC)
 
-OBJS = $(EXEC:=.o)
+OBJS = main_gol.o gol_acc.o $(COMMON_OBJS)
 DEPS = $(OBJS:.o=.d)
 
 -include $(DEPS)
@@ -48,8 +48,11 @@ main_gol.o: main_gol.cpp
 main_gol: main_gol.o $(COMMON_OBJS)
 	$(CXX) $(CXXFLAGS) -o main_gol $^ $(CXXFLAGS)
 
-#gol_acc: gol_acc.cpp $(COMMON_OBJS)
-#	$(ACC) $(ACCFLAGS) -o gol_acc $^ $(LDSFlAGS)
+gol_acc: gol_acc.cpp $(COMMON_OBJS)
+	$(ACC) $(ACCFLAGS) -o gol_acc $^ $(LDSFlAGS)
+
+gol_acc.o: gol_acc.cpp
+	$(CXX) $(CXXFLAGS) -c gol_acc.cpp
 
 clean: clean_common
 	/bin/rm -fv $(EXEC) *.o *.optrpt *.d
