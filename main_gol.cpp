@@ -170,17 +170,30 @@ private:
     //Included parameter to enable generation control
     void generation(int g) {
         double t_begin=0;
+        double t_ave=0;
+        double ave_times [g] = {};
         TimerType t0 = getTimeStamp();
         do {
             display();
+            TimerType t1 = getTimeStamp();
             rl->applyRules();
             rl->swapWrds();
+            TimerType t2 = getTimeStamp();
+            double t3 = getElapsedTime(t1,t2);
+            ave_times[gen] = t3;
             gen++;
         }
         while ( gen < g );
-        TimerType t1 = getTimeStamp();
-        t_begin = getElapsedTime(t0,t1)*1000;
+        TimerType t4 = getTimeStamp();
+        t_begin = getElapsedTime(t0,t4)*1000;
+        double sum =0;
+
+        for(int i=0;i<g;i++){
+            sum+= ave_times[i];
+        }
+        double average_runtime = sum/g;
         std::cout << "Runtime for " << g << " generations: " << t_begin << "\n\n";
+        std::cout << "Average runtime per generation: " << average_runtime << "\n\n";
     }
     rule* rl;
     world* wrd;
