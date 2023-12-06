@@ -15,8 +15,8 @@ ACCFLAGS+= -Minfo=acc
 LD		= $(ACC)
 #LDFLAGS = -lcudart $(ACCFLAGS)
 LDFLAGS = $(ACCFLAGS)
-#LIBS	= -lcublas #-lcblas -lopenblas
-LIBS	= -cudalib=cublas -lstdc++
+LIBS	= -lcublas #-lcblas -lopenblas
+#LIBS	= -cudalib=cublas -lstdc++
 
 ifeq ($(CXX),icpc)
   CXXFLAGS += -xHost #-no-vec
