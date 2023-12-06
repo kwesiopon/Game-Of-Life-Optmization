@@ -5,6 +5,7 @@
 #include <cstring>
 #include "timer.h"
 
+#define RESTRICT restrict
 
 typedef unsigned char byte;
 
