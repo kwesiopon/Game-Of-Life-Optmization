@@ -4,12 +4,12 @@ DBG      ?= -g
 CXX      ?= g++
 CXXFLAGS  = -O3 -I. -std=c++11 -I$(COMMON) $(DBG)
 
-NVCC	= nvcc
-NVFLAGS	= -O3 -g -I. -std=c++11 -I$(COMMON) -arch sm_70 -g --resource-usage -O3
+#NVCC	= nvcc
+#NVFLAGS	= -O3 -g -I. -std=c++11 -I$(COMMON) -arch sm_70 -g --resource-usage -O3
 
-ACC	    = nvc++
-ACCFLAGS= -O3 -g -I. -std=c++11 -I$(COMMON) -acc -gpu=cc70 -g --restrict
-ACCFLAGS+= -Minfo=acc
+#ACC	    = nvc++
+#ACCFLAGS= -O3 -g -I. -std=c++11 -I$(COMMON) -acc -gpu=cc70 -g --restrict
+#ACCFLAGS+= -Minfo=acc
 
 
 LD		= $(ACC)
@@ -49,8 +49,8 @@ main_gol.o: main_gol.cpp
 main_gol: main_gol.o $(COMMON_OBJS)
 	$(CXX) $(CXXFLAGS) -o main_gol $^ $(CXXFLAGS)
 
-gol_acc: gol_acc.cpp $(COMMON_OBJS)
-	$(ACC) $(ACCFLAGS) -o gol_acc $^ $(LDSFlAGS)
+#gol_acc: gol_acc.cpp $(COMMON_OBJS)
+#	$(ACC) $(ACCFLAGS) -o gol_acc $^ $(LDSFlAGS)
 
 clean: clean_common
 	/bin/rm -fv $(EXEC) *.o *.optrpt *.d

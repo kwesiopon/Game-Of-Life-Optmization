@@ -171,7 +171,7 @@ private:
     void generation(int g) {
         double t_begin=0;
         double t_ave=0;
-        double ave_times [g] = {};
+        double ave_times [100] = {};
         TimerType t0 = getTimeStamp();
         do {
             display();
@@ -191,7 +191,7 @@ private:
         for(int i=0;i<g;i++){
             sum+= ave_times[i];
         }
-        double average_runtime = sum/g;
+        double average_runtime = (sum/g)*1000;
         std::cout << "Runtime for " << g << " generations: " << t_begin << "\n\n";
         std::cout << "Average runtime per generation: " << average_runtime << "\n\n";
     }
