@@ -7,7 +7,7 @@ NVCC	    = nvcc
 NVFLAGS	= -O3 -g -I. -std=c++11 -I$(COMMON) -arch sm_70 -g --resource-usage -O3
 
 ACC	        = nvc++
-ACCFLAGS    = -O3 -g -I. -std=c++11 -I$(COMMON) -acc -gpu=ccnative -g --restrict
+ACCFLAGS    = -O3 -g -I. -std=c++11 -I$(COMMON) -acc -gpu=nordc -g --restrict
 ACCFLAGS   += -Minfo=acc
 
 
