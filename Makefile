@@ -3,6 +3,7 @@ COMMON_OBJS = timer.o dummy.o
 DBG      ?= -g
 CXX      ?= g++
 CXXFLAGS  = -O3 -I. -std=c++11 -I$(COMMON) $(DBG)
+CXXFLAGS  += -fopenmp
 
 NVCC	    = nvcc
 NVFLAGS	= -O3 -g -I. -std=c++11 -I$(COMMON) -arch sm_70 -g --resource-usage -O3
@@ -28,11 +29,11 @@ ifeq ($(CXX),g++)
   CXXFLAGS += -mtune=native -march=native
 endif
 
-EXEC = main_gol gol_acc
+EXEC = main_gol gol_acc gol_omp
 
 all: $(EXEC)
 
-OBJS = main_gol.o gol_acc.o $(COMMON_OBJS)
+OBJS = main_gol.o gol_acc.o gol_omp.o $(COMMON_OBJS)
 DEPS = $(OBJS:.o=.d)
 
 -include $(DEPS)
@@ -53,7 +54,15 @@ gol_acc: gol_acc.cpp $(COMMON_OBJS)
 	$(ACC) $(ACCFLAGS) -o gol_acc $^ $(LDSFlAGS)
 
 gol_acc.o: gol_acc.cpp
-	$(CXX) $(CXXFLAGS) -c gol_acc.cpp
+	$(CXX) $(CXXFLAGS) -c gol_acc.cppgol_acc: gol_acc.cpp $(COMMON_OBJS)
+	$(ACC) $(ACCFLAGS) -o gol_acc $^ $(LDSFlAGS)
+
+gol_omp: gol_omp.cpp $(COMMON_OBJS)
+	$(ACC) $(ACCFLAGS) -o gol_omp $^ $(LDSFlAGS)
+
+gol_omp.o: gol_omp.cpp
+	$(CXX) $(CXXFLAGS) -c gol_omp.cppgol_omp: gol_omp.cpp $(COMMON_OBJS)
+
 
 clean: clean_common
 	/bin/rm -fv $(EXEC) *.o *.optrpt *.d
