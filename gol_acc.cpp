@@ -57,6 +57,7 @@ public:
     }
     //potential point for optimization due to the hei/wid variables.
     bool hasLivingCells() {
+        #pragma acc parallel loop
         for( int y = 0; y < hei; y++ )
             for( int x = 0; x < wid; x++ )
                 if( wrd->at( x, y ) ) return true;
