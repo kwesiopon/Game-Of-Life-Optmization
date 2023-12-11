@@ -171,7 +171,7 @@ private:
     void generation(int g) {
         double t_begin=0;
         double t_ave=0;
-        double ave_times [100] = {};
+        double ave_times = 0;
         TimerType t0 = getTimeStamp();
         do {
             display();
@@ -180,18 +180,14 @@ private:
             rl->swapWrds();
             TimerType t2 = getTimeStamp();
             double t3 = getElapsedTime(t1,t2);
-            ave_times[gen] = t3;
+            ave_times += t3;
             gen++;
         }
         while ( gen < g );
         TimerType t4 = getTimeStamp();
         t_begin = getElapsedTime(t0,t4)*1000;
-        double sum =0;
-
-        for(int i=0;i<g;i++){
-            sum+= ave_times[i];
-        }
-        double average_runtime = (sum/g)*1000;
+        
+        double average_runtime = (ave_times*1000/g);
         std::cout << "Runtime for " << g << " generations: " << t_begin << "\n\n";
         std::cout << "Average runtime per generation: " << average_runtime << "\n\n";
     }
@@ -219,8 +215,8 @@ int main( int argc, char* argv[] ) {
     int g = 10;
 
     //default world size
-    int height = 12;
-    int width = 20;
+    int height = 10;
+    int width = 10;
 
     for (int i = 1; i < argc; ++i) {
 #define check_index(i, str) \

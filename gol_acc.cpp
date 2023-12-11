@@ -7,13 +7,6 @@
 
 #define RESTRICT restrict
 
-#ifdef __NVCOMPILER
-#  define FMT_NVCOMPILER_VERSION \
-    (__NVCOMPILER_MAJOR__ * 100 + __NVCOMPILER_MINOR__)
-#else
-#  define FMT_NVCOMPILER_VERSION 0
-#endif
-
 typedef unsigned char byte;
 
 class world {
@@ -22,8 +15,12 @@ public:
         int s = _wid * _hei * sizeof( byte );
         _cells = new byte[s];
         memset( _cells, 0, s );
+     #pragma acc enter data copyin(this)
+     #pragma acc enter data create(_cells[0:s])
     }
     ~world() {
+    #pragma acc exit data delete(_cells)
+    #pragma acc exit data delete(this)
         delete [] _cells;
     }
     int wid() const {
@@ -32,12 +29,15 @@ public:
     int hei() const {
         return _hei;
     }
+    #pragma acc routine seq
     byte at( int x, int y ) const {
         return _cells[x + y * _wid];
     }
+    #pragma acc routine seq
     void set( int x, int y, byte c ) {
         _cells[x + y * _wid] = c;
     }
+    #pragma acc routine seq
     void swap( world* w ) {
         memcpy( _cells, w->_cells, _wid * _hei * sizeof( byte ) );
     }
@@ -45,24 +45,43 @@ private:
     int _wid, _hei;
     byte* _cells;
 };
+
 class rule {
 public:
     rule( world* w ) : wrd( w ) {
         wid = wrd->wid();
         hei = wrd->hei();
         wrdT = new world( wid, hei );
+     #pragma acc enter data copyin(this)
     }
     ~rule() {
+        #pragma acc exit data delete(this)
         if( wrdT ) delete wrdT;
     }
     //potential point for optimization due to the hei/wid variables.
     bool hasLivingCells() {
-        #pragma acc parallel loop
-        for( int y = 0; y < hei; y++ )
-            for( int x = 0; x < wid; x++ )
-                if( wrd->at( x, y ) ) return true;
-        std::cout << "*** All cells are dead!!! ***\n\n";
-        return false;
+	bool anyLivingCells = false;
+       #pragma acc data present(n) 
+       #pragma acc parallel loop \
+			     collapse(1)\
+			     /*device_type(nvidia)*/\
+ 	                     gang \
+			     /*num_workers(4)*/ \
+			     vector \
+			     vector_length(128) \
+                            /* tile(4,4)*/   
+       	for( int y = 0; y < hei; y++ )
+             #pragma acc loop vector  
+             for( int x = 0; x < wid; x++ )
+                if( wrd->at( x, y ) ) anyLivingCells = true;
+        	//std::cout << "*** All cells are dead!!! ***\n\n";
+        if(anyLivingCells) return true;
+	else 
+	{
+	    std::cout << "*** All cells are dead!!! ***\n\n";
+	    return false;
+	}
+	
     }
     void swapWrds() {
         wrd->swap( wrdT );
@@ -74,9 +93,19 @@ public:
         _stay = stay;
     }
     //another point of optimization
+    //#pragma acc routine seq
     void applyRules() {
-        int n;
-        for( int y = 0; y < hei; y++ ) {
+        int n; 
+	#pragma acc data copy(n[0:wid])
+	//#pragma acc kernels
+	#pragma acc parallel \
+			loop \
+                        collapse(1)\
+                        gang/* num_gangs(4)*/\
+			/*num_workers(4)*/\
+		        vector_length(64)
+        for( int y = 0; y < hei; y++ ) { 
+	    #pragma acc loop vector  
             for( int x = 0; x < wid; x++ ) {
                 n = neighbours( x, y );
                 if( wrd->at( x, y ) ) {
@@ -86,9 +115,11 @@ public:
                 }
             }
         }
+	
     }
     //potentially not a good candidate due to the short lengths of the iterations
 private:
+    #pragma acc routine seq
     int neighbours( int xx, int yy ) {
         int n = 0, nx, ny;
         for( int y = -1; y < 2; y++ ) {
@@ -101,9 +132,11 @@ private:
         }
         return n;
     }
+    //#pragma acc routine seq
     bool inStay( int n ) {
         return( _stay.end() != find( _stay.begin(), _stay.end(), n ) );
     }
+    //#pragma acc routine seq
     bool inBirth( int n ) {
         return( _birth.end() != find( _birth.begin(), _birth.end(), n ) );
     }
@@ -115,9 +148,11 @@ class cellular {
 public:
     cellular( int w, int h ) : rl( 0 ) {
         wrd = new world( w, h );
+	//#pragma acc enter data copyin(this)
     }
     ~cellular() {
-        if( rl ) delete rl;
+	//#pragma acc exit data delete(this)
+        if( rl )  delete rl;
         delete wrd;
     }
     //customized to allow predetermined generations
@@ -158,11 +193,13 @@ public:
 private:
     //potential candidate (poor) for optimization
     //should investigate a way to record runtime for each iteration.
+    //#pragma acc routine seq
     void display() {
         system( "cls" );
         int wid = wrd->wid(),
                 hei = wrd->hei();
         std::cout << "+" << std::string( wid, '-' ) << "+\n";
+        //#pragma acc kernels 
         for( int y = 0; y < hei; y++ ) {
             std::cout << "|";
             for( int x = 0; x < wid; x++ ) {
@@ -178,18 +215,26 @@ private:
 
     //Included parameter to enable generation control
     void generation(int g) {
-        double t_begin=0;
+        double t_begin  = 0;
+	double t_ave    = 0;
+        double ave_time = 0;
         TimerType t0 = getTimeStamp();
         do {
             display();
+	    TimerType t1 = getTimeStamp();
             rl->applyRules();
             rl->swapWrds();
+	    TimerType  t2 = getTimeStamp();
+            double elapsed_t = getElapsedTime(t1,t2);
+            ave_time += elapsed_t;
             gen++;
         }
         while ( gen < g );
         TimerType t1 = getTimeStamp();
         t_begin = getElapsedTime(t0,t1)*1000;
+        double average_runtime = (ave_time/g)*1000;
         std::cout << "Runtime for " << g << " generations: " << t_begin << "ms" << "\n\n";
+	std::cout << "Average runtime per generation: " << average_runtime << "ms" << "\n\n"; 
     }
     rule* rl;
     world* wrd;
