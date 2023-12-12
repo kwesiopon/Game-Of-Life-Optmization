@@ -1,4 +1,4 @@
-COMMON = ../common
+COMMON = ./
 COMMON_OBJS = timer.o dummy.o
 DBG      ?= -g
 CXX      ?= g++
@@ -10,6 +10,7 @@ NVFLAGS	= -O3 -g -I. -std=c++11 -I$(COMMON) -arch sm_70 -g --resource-usage -O3
 
 ACC	        = nvc++
 ACCFLAGS    = -O3 -g -I. -std=c++11 -I$(COMMON) -acc -gpu=cc70,managed -g --restrict
+#ACCFLAGS    = -O3 -g -I. -std=c++11 -I$(COMMON) -acc -gpu=cc70 -g --restrict
 ACCFLAGS   += -Minfo=acc
 
 

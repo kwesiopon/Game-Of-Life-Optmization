@@ -16,7 +16,7 @@ public:
         _cells = new byte[s];
         memset( _cells, 0, s );
      #pragma acc enter data copyin(this)
-     #pragma acc enter data create(_cells[0:s])
+     #pragma acc enter data copyin(_cells[0:s])
     }
     ~world() {
     #pragma acc exit data delete(_cells)
@@ -29,15 +29,15 @@ public:
     int hei() const {
         return _hei;
     }
-    #pragma acc routine seq
+    //#pragma acc routine seq
     byte at( int x, int y ) const {
         return _cells[x + y * _wid];
     }
-    #pragma acc routine seq
+    //#pragma acc routine seq
     void set( int x, int y, byte c ) {
         _cells[x + y * _wid] = c;
     }
-    #pragma acc routine seq
+    //#pragma acc routine seq
     void swap( world* w ) {
         memcpy( _cells, w->_cells, _wid * _hei * sizeof( byte ) );
     }
@@ -61,12 +61,12 @@ public:
     //potential point for optimization due to the hei/wid variables.
     bool hasLivingCells() {
 	bool anyLivingCells = false;
-       #pragma acc data present(n) 
+       //#pragma acc data present(n) 
        #pragma acc parallel loop \
-			     collapse(1)\
+			     /*collapse(1)*/\
 			     /*device_type(nvidia)*/\
- 	                     gang \
-			     /*num_workers(4)*/ \
+ 	                     gang num_gangs(2) \
+			     num_workers(8) \
 			     vector \
 			     vector_length(128) \
                             /* tile(4,4)*/   
@@ -74,16 +74,17 @@ public:
              #pragma acc loop vector  
              for( int x = 0; x < wid; x++ )
                 if( wrd->at( x, y ) ) anyLivingCells = true;
-        	//std::cout << "*** All cells are dead!!! ***\n\n";
+        std::cout << "*** All cells are dead!!! ***\n\n";
         if(anyLivingCells) return true;
 	else 
 	{
 	    std::cout << "*** All cells are dead!!! ***\n\n";
 	    return false;
 	}
-	
+	   
     }
     void swapWrds() {
+        #pragma acc serial
         wrd->swap( wrdT );
     }
     void setRuleB( std::vector<int>& birth ) {
@@ -95,17 +96,18 @@ public:
     //another point of optimization
     //#pragma acc routine seq
     void applyRules() {
-        int n; 
-	#pragma acc data copy(n[0:wid])
+        int n;
+	//#pragma acc data copy(n[0:wid*hei])
 	//#pragma acc kernels
 	#pragma acc parallel \
 			loop \
-                        collapse(1)\
-                        gang/* num_gangs(4)*/\
-			/*num_workers(4)*/\
-		        vector_length(64)
+                        /*collapse(1)*/\
+			/*device_type(nvidia)*/\
+                        gang num_gangs(2)\
+			num_workers(8)\
+		        vector_length(128)
         for( int y = 0; y < hei; y++ ) { 
-	    #pragma acc loop vector  
+	    #pragma acc loop vector   
             for( int x = 0; x < wid; x++ ) {
                 n = neighbours( x, y );
                 if( wrd->at( x, y ) ) {
@@ -119,7 +121,7 @@ public:
     }
     //potentially not a good candidate due to the short lengths of the iterations
 private:
-    #pragma acc routine seq
+    //#pragma acc routine seq
     int neighbours( int xx, int yy ) {
         int n = 0, nx, ny;
         for( int y = -1; y < 2; y++ ) {
@@ -195,7 +197,7 @@ private:
     //should investigate a way to record runtime for each iteration.
     //#pragma acc routine seq
     void display() {
-        system( "cls" );
+        //system( "cls" );
         int wid = wrd->wid(),
                 hei = wrd->hei();
         std::cout << "+" << std::string( wid, '-' ) << "+\n";
@@ -216,11 +218,10 @@ private:
     //Included parameter to enable generation control
     void generation(int g) {
         double t_begin  = 0;
-	double t_ave    = 0;
         double ave_time = 0;
         TimerType t0 = getTimeStamp();
+        //#pragma acc parallel
         do {
-            display();
 	    TimerType t1 = getTimeStamp();
             rl->applyRules();
             rl->swapWrds();
@@ -233,6 +234,7 @@ private:
         TimerType t1 = getTimeStamp();
         t_begin = getElapsedTime(t0,t1)*1000;
         double average_runtime = (ave_time/g)*1000;
+	//display();
         std::cout << "Runtime for " << g << " generations: " << t_begin << "ms" << "\n\n";
 	std::cout << "Average runtime per generation: " << average_runtime << "ms" << "\n\n"; 
     }

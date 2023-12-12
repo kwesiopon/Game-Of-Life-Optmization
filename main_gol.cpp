@@ -209,14 +209,14 @@ void help(const char* prg)
 
 int main( int argc, char* argv[] ) {
     //default cellular automata: in this case, Game of Life
-    int automata = 1;
+    int automata = 4;
 
     //the default number of generations
     int g = 10;
 
     //default world size
-    int height = 10;
-    int width = 10;
+    int height = 20;
+    int width = 20;
 
     for (int i = 1; i < argc; ++i) {
 #define check_index(i, str) \

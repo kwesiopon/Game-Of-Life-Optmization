@@ -1,5 +1,5 @@
-#include "../timer.h"
-#include "../dummy.h"
+#include "timer.h"
+#include "dummy.h"
 
 #ifdef __cplusplus
 extern "C"

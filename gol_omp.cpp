@@ -5,6 +5,7 @@
 #include <cstring>
 #include "timer.h"
 
+#include <omp.h>
 
 typedef unsigned char byte;
 
@@ -49,7 +50,9 @@ public:
     }
     //potential point for optimization due to the hei/wid variables.
     bool hasLivingCells() {
+	//#pragma omp parallel
         for( int y = 0; y < hei; y++ )
+	    #pragma omp parallel for nowait
             for( int x = 0; x < wid; x++ )
                 if( wrd->at( x, y ) ) return true;
         std::cout << "*** All cells are dead!!! ***\n\n";
