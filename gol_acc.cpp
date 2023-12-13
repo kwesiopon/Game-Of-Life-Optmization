@@ -103,9 +103,9 @@ public:
 			loop \
                         /*collapse(1)*/\
 			/*device_type(nvidia)*/\
-                        gang num_gangs(2)\
-			num_workers(8)\
-		        vector_length(128)
+                        gang num_gangs(32)\
+			num_workers(4)\
+		        vector_length(256)
         for( int y = 0; y < hei; y++ ) { 
 	    #pragma acc loop vector   
             for( int x = 0; x < wid; x++ ) {
