@@ -4,6 +4,7 @@
 #include <string>
 #include <cstring>
 #include "timer.h"
+#include "omp.h"
 
 #define RESTRICT restrict
 
@@ -27,7 +28,7 @@ public:
         return _wid;
     }
     int hei() const {
-        return _hei;
+	    return _hei;
     }
     //#pragma acc routine seq
     byte at( int x, int y ) const {
@@ -62,14 +63,14 @@ public:
     bool hasLivingCells() {
 	bool anyLivingCells = false;
        //#pragma acc data present(n) 
-       #pragma acc parallel loop \
+        #pragma acc parallel loop \
 			     /*collapse(1)*/\
 			     /*device_type(nvidia)*/\
- 	                     gang num_gangs(2) \
+ 	                    /* gang num_gangs(2) \
 			     num_workers(8) \
 			     vector \
 			     vector_length(128) \
-                            /* tile(4,4)*/   
+                            * tile(4,4)*/   
        	for( int y = 0; y < hei; y++ )
              #pragma acc loop vector  
              for( int x = 0; x < wid; x++ )
@@ -89,30 +90,27 @@ public:
     }
     void setRuleB( std::vector<int>& birth ) {
         _birth = birth;
-    }
+    } 
     void setRuleS( std::vector<int>& stay ) {
         _stay = stay;
     }
     //another point of optimization
-    //#pragma acc routine seq
     void applyRules() {
         int n;
-	//#pragma acc data copy(n[0:wid*hei])
-	//#pragma acc kernels
-	#pragma acc parallel \
-			loop \
-                        /*collapse(1)*/\
-			/*device_type(nvidia)*/\
-                        gang num_gangs(32)\
-			num_workers(4)\
-		        vector_length(256)
+	#pragma acc parallel loop \
+			/*loop*/ 
+                        /*gang*/ /* num_gangs(32)*/
+			/*worker num_workers(4)*/
+		        /*vector*/ /*vector_length(256)*/
         for( int y = 0; y < hei; y++ ) { 
-	    #pragma acc loop vector   
+	    #pragma acc loop gang,vector 
             for( int x = 0; x < wid; x++ ) {
                 n = neighbours( x, y );
                 if( wrd->at( x, y ) ) {
+		    //printf("word at %03d is set: %d/n",x,y);
                     wrdT->set( x, y, inStay( n ) ? 1 : 0 );
                 } else {
+		    //printf("word at %03d is set: %d/n",x,y);
                     wrdT->set( x, y, inBirth( n ) ? 1 : 0 );
                 }
             }
@@ -121,7 +119,7 @@ public:
     }
     //potentially not a good candidate due to the short lengths of the iterations
 private:
-    //#pragma acc routine seq
+    
     int neighbours( int xx, int yy ) {
         int n = 0, nx, ny;
         for( int y = -1; y < 2; y++ ) {
@@ -129,16 +127,18 @@ private:
                 if( !x && !y ) continue;
                 nx = ( wid + xx + x ) % wid;
                 ny = ( hei + yy + y ) % hei;
+                nx = ( wid + xx + x ) % wid;
+                ny = ( hei + yy + y ) % hei;
                 n += wrd->at( nx, ny ) > 0 ? 1 : 0;
             }
         }
         return n;
     }
-    //#pragma acc routine seq
+    
     bool inStay( int n ) {
         return( _stay.end() != find( _stay.begin(), _stay.end(), n ) );
     }
-    //#pragma acc routine seq
+  
     bool inBirth( int n ) {
         return( _birth.end() != find( _birth.begin(), _birth.end(), n ) );
     }
@@ -150,10 +150,8 @@ class cellular {
 public:
     cellular( int w, int h ) : rl( 0 ) {
         wrd = new world( w, h );
-	//#pragma acc enter data copyin(this)
     }
     ~cellular() {
-	//#pragma acc exit data delete(this)
         if( rl )  delete rl;
         delete wrd;
     }
@@ -200,8 +198,7 @@ private:
         //system( "cls" );
         int wid = wrd->wid(),
                 hei = wrd->hei();
-        std::cout << "+" << std::string( wid, '-' ) << "+\n";
-        //#pragma acc kernels 
+        std::cout << "+" << std::string( wid, '-' ) << "+\n"; 
         for( int y = 0; y < hei; y++ ) {
             std::cout << "|";
             for( int x = 0; x < wid; x++ ) {
@@ -216,12 +213,12 @@ private:
     }
 
     //Included parameter to enable generation control
+    //#pragma acc parallel
     void generation(int g) {
         double t_begin  = 0;
         double ave_time = 0;
         TimerType t0 = getTimeStamp();
-        //#pragma acc parallel
-        do {
+       for(int i =0; i<g ;i++) {
 	    TimerType t1 = getTimeStamp();
             rl->applyRules();
             rl->swapWrds();
@@ -230,13 +227,19 @@ private:
             ave_time += elapsed_t;
             gen++;
         }
-        while ( gen < g );
-        TimerType t1 = getTimeStamp();
-        t_begin = getElapsedTime(t0,t1)*1000;
-        double average_runtime = (ave_time/g)*1000;
+        //while ( gen < g );
+        TimerType t4 = getTimeStamp();
+       // t_begin = getElapsedTime(t0,t1)*1000;
+        t_begin = getElapsedTime(t0,t4)*1000;
+	double t_ave = (ave_time*1000/g);
+	
+	/*
+	for(int i=0;i<g;i++){
+	    t_ave += ave_times[i];
+	}*/
 	//display();
         std::cout << "Runtime for " << g << " generations: " << t_begin << "ms" << "\n\n";
-	std::cout << "Average runtime per generation: " << average_runtime << "ms" << "\n\n"; 
+	std::cout << "Average runtime per generation: " << t_ave  << "ms" << "\n\n"; 
     }
     rule* rl;
     world* wrd;
