@@ -40,7 +40,10 @@ public:
     }
     //#pragma acc routine seq
     void swap( world* w ) {
-        memcpy( _cells, w->_cells, _wid * _hei * sizeof( byte ) );
+       // memcpy( _cells, w->_cells, _wid * _hei * sizeof( byte ) );
+       #pragma acc parallel loop
+	for (size_t i = 0; i < _wid * _hei; ++i)
+    	    _cells[i] = w->_cells[i];
     }
 private:
     int _wid, _hei;
@@ -85,7 +88,7 @@ public:
 	   
     }
     void swapWrds() {
-        #pragma acc serial
+       // #pragma acc serial
         wrd->swap( wrdT );
     }
     void setRuleB( std::vector<int>& birth ) {
