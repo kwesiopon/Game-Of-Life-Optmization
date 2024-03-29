@@ -8,10 +8,8 @@ Game of Life Optimization Using GPU Parallelism (and potentially SIMD)
 
 ### How do I get set up? ###
 
-* Clone repo and quickly 
-* Configuration
-* Dependencies
-* Database configuration
+* Clone the repository
+* In order to use the openACC version of the code, please ensure you have some GPU processing on your machine
 * How to run tests
 * Deployment instructions
 
